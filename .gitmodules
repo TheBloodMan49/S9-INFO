@@ -1,0 +1,9 @@
+[submodule "IHM-UX"]
+	path = IHM-UX
+	url = git@github.com:KwikKill/IHM-UX.git
+[submodule "Repro"]
+	path = Repro
+	url = git@github.com:TheBloodMan49/S9-Reproductibility-of-experimentations.git
+[submodule "DSL"]
+	path = DSL
+	url = git@github.com:TheBloodMan49/S9-DSL-CLIvilization.git
