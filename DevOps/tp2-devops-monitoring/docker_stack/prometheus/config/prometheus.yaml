@@ -1,0 +1,25 @@
+global: #Définition des options globales à Prometheus
+  scrape_interval: 15s #Interval de temps pour le Scrapping
+
+scrape_configs: #Configuration des sources de scrapping
+  - job_name: 'prometheus'
+    static_configs: 
+      - targets: ['localhost:9090'] #Configuration du endpoint renvoyant des métriques 
+
+  - job_name: 'docker'
+    static_configs:
+      - targets: ['172.17.0.1:9323'] 
+
+  - job_name: 'cadvisor'
+    static_configs:
+      - targets: ['172.17.0.1:8080']
+
+  - job_name: 'jmx-exporter'
+    static_configs:
+      - targets: ['jmx-exporter:5556']
+
+  - job_name: 'spring-boot-app'
+    metrics_path: '/actuator/prometheus'
+    static_configs:
+      - targets: ['172.17.0.1:8081'] # The address and port of your Spring Boot application
+

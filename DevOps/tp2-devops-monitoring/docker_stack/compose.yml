@@ -1,0 +1,51 @@
+
+services:
+  prometheus: #Nom du service
+    image: prom/prometheus:v2.55.0 #image
+    container_name: prometheus #Nom du conteneur
+    ports:
+      - 9090:9090 #Port partagé [machine hôte]:[conteuneur]
+    command:
+      - '--config.file=/etc/prometheus/prometheus.yaml' #fichier de configuration de prometheus pour le scrapiong
+    volumes:
+      - ./prometheus/config/prometheus.yaml:/etc/prometheus/prometheus.yaml:ro #Partage des volumes pour l'accès aux fichiers et données scrappées
+      - ./prometheus/data:/prometheus/data
+    restart: unless-stopped
+    user: "1000:1000" #Définition des droits utilisateurs
+
+  grafana:
+    image: grafana/grafana-oss:latest
+    container_name: grafana
+    ports:
+      - 3000:3000
+    volumes:
+      - ./grafana/grafana:/var/lib/grafana
+      - ./grafana/grafana/dashboards:/var/lib/dashboards
+    restart: unless-stopped
+    user: "1000:1000"
+
+  cadvisor:
+    image: gcr.io/cadvisor/cadvisor
+    volumes: #Ensemble des volumes nécessaires pour la collecte des métriques depuis le conteuneur cAdvisor
+      - /:/rootfs:ro
+      - /var/run:/var/run:ro
+      - /sys:/sys:ro
+      - /var/lib/docker/:/var/lib/docker:ro
+      - /dev/disk/:/dev/disk:ro
+    ports:
+      - "8080:8080"
+    privileged: true
+    devices:
+      - /dev/kmsg
+
+  jmx-exporter:
+    image: sscaling/jmx-prometheus-exporter
+    ports:
+      - 5556:5556
+
+
+networks:
+  default:
+    driver: bridge
+
+

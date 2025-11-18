@@ -1,0 +1,6 @@
+Feature: Addition
+
+    Scenario: Add two numbers
+        Given two numbers 5 and 3
+        When the two numbers are added
+        Then the result should be 8
