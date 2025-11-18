@@ -1,0 +1,6 @@
+CompProg/*
+!CompProg/*.cpp
+!CompProg/*.png
+!CompProg/*.ipynb
+
+DevOps/project/
