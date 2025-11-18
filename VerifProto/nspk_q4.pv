@@ -1,0 +1,68 @@
+(* declaring a free channel name *)
+free c:channel.
+
+(* declaring additional types; type bitstring is a default type *)
+type pkey.
+type skey.
+
+
+(* declaring private names *)
+free ska, skb:skey [private]. 
+
+(* attacker's private key *)
+free skc:skey.
+
+
+(* Public key cryptography *)
+fun pk(skey):pkey.		        (* public key*)
+fun aenc(bitstring, pkey):bitstring. 	(* asymmetric encryption *)
+fun adec(bitstring, skey):bitstring.	(* asymmetric decryption *)
+
+
+(* equational theory for pk encryption *)
+equation forall x:bitstring, y:skey; adec(aenc(x,pk(y)),y) = x.
+
+(* events *)
+	(* declare events here *)
+event reach.
+event acceptI(pkey, pkey, bitstring, bitstring).
+event startR(pkey, pkey, bitstring, bitstring).
+
+(* queries *)
+	(* fill in queries here *)
+query event(reach).
+query ski: pkey, skr: pkey, ni: bitstring, nr: bitstring; event(acceptI(ski, skr, ni, nr)) ==> event(startR(ski, skr, ni, nr)).
+
+
+(* initiator process *)
+let Pi(ski:skey, pkr:pkey) = 
+		new na:bitstring; 
+		out(c, aenc((pk(ski),na), pkr));
+		in(c, x:bitstring);
+		let (=na, nr:bitstring) = adec(x, ski) in 
+			(* '=na' checks that the value is equal to na, else behaves as 0 *)
+			(* one could have used an if statement as well  *)
+		out(c, aenc(nr,pkr));
+		if pkr = pk(ska) || pkr = pk(skb) then
+		event acceptI(pk(ski), pkr, na, nr).
+	 
+
+(* responder process *)
+let Pr (sk:skey)= 
+    in(c, m1:bitstring);
+    let (pki:pkey, ni:bitstring) = adec(m1, sk) in
+    new nb:bitstring;
+		event startR(pki, pk(sk), ni, nb);
+    out(c, aenc((ni,nb), pki));
+    in(c, m2:bitstring);
+    if adec(m2, sk) = nb then
+    event reach
+    else 0.
+
+
+
+(* main process *)
+process  ( !Pi(ska, pk(skb)) | !Pi(ska, pk(skc)) 
+	| !Pi(skb, pk(ska)) | !Pi(skb, pk(skc)) 
+	| !Pr(skb) | !Pr(ska)
+	| out(c, pk(ska)) | out(c, pk(skb)))
