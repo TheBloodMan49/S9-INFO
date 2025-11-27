@@ -10,3 +10,6 @@
 [submodule "SFFS/project"]
 	path = SFFS/project
 	url = git@github.com:Sironysos/INSA-S9-SFFS-Grafana.git
+[submodule "DevOps/project"]
+	path = DevOps/project
+	url = ssh://git@gitlab.insa-rennes.fr:16022/devops-2025/devops_mohamed-allay_paul-gasnier_kevin-tollemer.git

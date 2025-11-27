@@ -1,0 +1,143 @@
+(* declaring a free channel name *)
+free c:channel.
+
+(* declaring additional types; type bitstring is a default type *)
+type pkey.
+type skey.
+type key.
+
+(* declaring private names *)
+free ska, skb, skc:skey [private]. 
+free ske:skey.
+free kac, kbc:key [private].
+free kec:key.
+
+(* Functions *)
+fun pk(skey):pkey.                (* public key *)
+fun senc(bitstring, key):bitstring.     (* symetric encryption *)
+fun kdf(bitstring): key.        (* key derivation func *)
+fun h(bitstring): bitstring.        (* hashing function    *)
+
+(* equational theory for symetric decryption *)
+reduc forall m:bitstring, k:key; sdec(senc(m,k),k) = m.
+
+(* events *)
+event acceptI(pkey, pkey, bitstring).
+event startR(pkey, pkey, bitstring).
+event acceptR(pkey, pkey, bitstring).
+event startI(pkey, pkey, bitstring).
+event secret_K(bitstring).
+
+(* queries *)
+query ski: pkey, skr: pkey, K: bitstring; event(acceptI(ski, skr, K)) ==> event(startR(ski, skr, K)).
+query ski: pkey, skr: pkey, K: bitstring; event(acceptR(ski, skr, K)) ==> event(startI(ski, skr, K)).
+query K: bitstring; event(secret_K(K)) && attacker(K) ==> false.
+query ski: pkey, skr: pkey, K: bitstring; event(acceptR(ski, skr, K)).
+
+(* initiator process *)
+let Pi(ski:skey, pki:pkey, pkr:pkey, pks:pkey, kis:key) = 
+    new ksess:bitstring;
+    let hashdeksess:bitstring = h(ksess) in
+    let hashdehashdeksess:bitstring = h(hashdeksess) in
+    (* 1er MESSAGE *)
+    out(c, pki);
+    out(c, hashdehashdeksess);
+    (* 2e MESSAGE *)
+    out(c, senc((pkr, ksess), kis));
+    (* 3e MESSAGE *)
+    in(c, g:bitstring);
+    let Nr:bitstring = sdec(g, kis) in
+    (* 5e MESSAGE *)
+    in(c, f:bitstring);
+    if f = hashdeksess then
+    (* 6e MESSAGE *)
+    in(c, j:bitstring);
+    in(c, i:bitstring);
+    let ksess2:bitstring = sdec(j, kdf(ksess)) in
+    let hashdeksess2:bitstring = h(ksess2) in
+    let nrparmessage:bitstring = sdec(i, kdf(ksess2)) in
+    if nrparmessage = Nr then
+    (* 7e MESSAGE *)
+    out(c, senc(hashdeksess2, kdf(ksess)));
+    new K:bitstring;
+    (* 8e MESSAGE *)
+    if pki = pk(ska) || pki = pk(skb) then
+    event startI(pki, pkr, K);
+    out(c, senc(K, kdf(ksess2)));
+    out(c, senc(Nr, kdf(K)));
+    (* 9e MESSAGE *)
+    in(c, n:bitstring);
+    let hK:bitstring = sdec(n, kdf(ksess2)) in
+    let hashdeK:bitstring = h(K) in
+    if hK = hashdeK then 
+    if (pki = pk(ska) || pki = pk(skb)) && (pkr = pk(ska) || pkr = pk(skb)) then
+    (event acceptI(pki, pkr, K);
+    event secret_K(K)).
+     
+
+(* responder process *)
+let Pr (skr:skey, pki:pkey, pkr:pkey, pks:pkey, krs:key) =
+    (* 1er MESSAGE *)
+    in(c, aa:bitstring);
+    in(c, a:bitstring);
+    (* 4e MESSAGE *)
+    in(c, d:bitstring);
+    in(c, e:bitstring);
+    let (=aa, ksess:bitstring) = sdec(d, krs) in
+    let Nr:bitstring = sdec(e, krs) in
+    let hashdeksess:bitstring = h(ksess) in
+    let hashdehashdeksess:bitstring = h(hashdeksess) in
+    if hashdehashdeksess = a then
+    (* 5e MESSAGE *)
+    out(c, hashdeksess);
+    new ksess2:bitstring;
+    (* 6e MESSAGE *)
+    out(c, senc(ksess2, kdf(ksess)));
+    out(c, senc(Nr, kdf(ksess2)));
+    (* 7e MESSAGE *)
+    in(c, k:bitstring);
+    let hksess2:bitstring = sdec(k, kdf(ksess)) in
+    let hashdeksess2:bitstring = h(ksess2) in
+    if hksess2 = hashdeksess2 then
+    (* 8e MESSAGE *)
+    in(c, l:bitstring);
+    in(c, m:bitstring);
+    let K:bitstring = sdec(l, kdf(ksess2)) in
+    let hashdeK:bitstring = h(K) in
+    let nrparmessage:bitstring = sdec(m, kdf(K)) in
+    if nrparmessage = Nr then
+    (* 9e MESSAGE *)
+    if pkr = pk(ska) || pkr = pk(skb) then
+    event startR(pki, pkr, K);
+    out(c, senc(hashdeK, kdf(ksess2)));
+    if pkr = pk(ska) || pkr = pk(skb) then
+    event acceptR(pki, pkr, K).
+    
+
+(* server process *)
+let Ps (sks:skey, pki:pkey, pkr:pkey, kis:key, krs:key) =
+    (* 2e MESSAGE *)
+    in(c, b:bitstring);
+    let (id:pkey, ksess:bitstring) = sdec(b, kis) in
+    if id = pkr then
+    new Nr:bitstring;
+    (* 3e MESSAGE *)
+    out(c, senc(Nr, kis));
+    (* 4e MESSAGE *)
+    out(c, senc((id, ksess), krs));
+    out(c, senc(Nr, krs)).
+
+
+(* main process *)
+process  ( 
+    !Pi(ska, pk(ska), pk(skb), pk(skc), kac) |
+    !Pr(skb, pk(ska), pk(skb), pk(skc), kbc) | 
+    !Ps(skc, pk(ska), pk(skb), kac, kbc) | 
+    out(c, pk(ska)) | 
+    out(c, pk(skb)) |
+    out(c, pk(skc))
+    (* Pi(ske, pk(ske), pk(skb), pk(skc), kec) |
+    Pr(ske, pk(ska), pk(ske), pk(skc), kec) |
+    Ps(skc, pk(ske), pk(skb), kec, kbc) |
+    Ps(skc, pk(ska), pk(ske), kac, kec) *)
+    )
