@@ -135,9 +135,7 @@ process  (
     !Ps(skc, pk(ska), pk(skb), kac, kbc) | 
     out(c, pk(ska)) | 
     out(c, pk(skb)) |
-    out(c, pk(skc))
-    (* Pi(ske, pk(ske), pk(skb), pk(skc), kec) |
-    Pr(ske, pk(ska), pk(ske), pk(skc), kec) |
-    Ps(skc, pk(ske), pk(skb), kec, kbc) |
+    out(c, pk(skc)) 
+    (* Ps(skc, pk(ske), pk(skb), kec, kbc) |
     Ps(skc, pk(ska), pk(ske), kac, kec) *)
     )
