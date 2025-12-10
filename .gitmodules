@@ -8,7 +8,7 @@
 	path = DSL
 	url = git@github.com:TheBloodMan49/S9-DSL-CLIvilization.git
 [submodule "SFFS/project"]
-	path = SFFS/project
+	path = SFFS/1-grafana
 	url = git@github.com:Sironysos/INSA-S9-SFFS-Grafana.git
 [submodule "DevOps/project"]
 	path = DevOps/project
