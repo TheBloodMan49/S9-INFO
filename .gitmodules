@@ -13,3 +13,9 @@
 [submodule "DevOps/project"]
 	path = DevOps/project
 	url = ssh://git@gitlab.insa-rennes.fr:16022/devops-2025/devops_mohamed-allay_paul-gasnier_kevin-tollemer.git
+[submodule "SFFS/3-unity"]
+	path = SFFS/3-unity
+	url = git@github.com:TheBloodMan49/S9-SFFS-Unity.git
+[submodule "SFFS/4-go"]
+	path = SFFS/4-go
+	url = git@github.com:TheBloodMan49/S9-SFFS-Go.git
