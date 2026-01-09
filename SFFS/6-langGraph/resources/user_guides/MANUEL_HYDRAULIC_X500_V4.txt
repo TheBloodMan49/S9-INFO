@@ -1,0 +1,25 @@
+MANUEL DE MAINTENANCE ET D'OPÉRATION
+MODÈLE : Hydraulic Press X500
+FABRICANT : HeavyMetal Industries
+
+SECTION 1 : COMPOSANTS PRINCIPAUX
+- Vérin hydraulique principal (Réf: CYL-Main-500)
+- Joint torique de tête (Réf: OR-500-A)
+- Filtre à huile (Réf: FLT-Hydra-X)
+- Pompe haute pression
+
+SECTION 2 : PROCÉDURES DE REMPLACEMENT
+A. REMPLACEMENT DU JOINT TORIQUE (OR-500-A)
+1. Verrouiller la machine (LOTO).
+2. Vidanger le réservoir d'huile hydraulique.
+3. Dévisser les 8 boulons de la tête du vérin (Clé de 32mm).
+4. Retirer l'ancien joint et nettoyer la gorge.
+5. Insérer le nouveau joint lubrifié.
+
+B. REMPLACEMENT DU FILTRE
+1. Dévisser le carter du filtre situé à l'arrière.
+2. Remplacer la cartouche filtrante.
+
+SECTION 3 : SÉCURITÉ
+- TOUJOURS ACTIVER LE VERROUILLAGE DE SÉCURITÉ AVANT INTERVENTION.
+- Pression résiduelle possible : purger le circuit avant démontage.

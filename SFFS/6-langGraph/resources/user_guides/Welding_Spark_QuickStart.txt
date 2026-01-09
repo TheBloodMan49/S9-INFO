@@ -1,0 +1,23 @@
+*** WELDING STATION SPARK - MANUAL ***
+
+COMPONENTS:
+- Torch Handle (TIG/MIG)
+- Contact Tip (Copper)
+- Wire Feeder Rollers
+- Ground Clamp
+
+MAINTENANCE TASKS:
+
+Task 1: Changing the Torch Tip
+- Unscrew the gas nozzle.
+- Unscrew the copper contact tip.
+- Screw in the new tip matching the wire diameter.
+
+Task 2: Cleaning Feeder Rollers
+- Open side panel.
+- Release the tension arm.
+- Wipe rollers with a solvent-free cloth.
+
+SAFETY:
+- UV Radiation: Auto-darkening helmet required.
+- Wear leather apron and gloves.

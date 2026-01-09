@@ -1,0 +1,23 @@
+FICHE TECHNIQUE : Conveyor Belt Ultra
+FOURNISSEUR : LogiMove
+
+LISTE DES PIÈCES DÉTACHÉES :
+- Moteur d'entraînement (400V Triphasé)
+- Courroie synthétique (Ref: Belt-Ultra-5m)
+- Roulements latéraux (Ref: Bearing-6204)
+- Variateur de fréquence
+
+PROTOCOLES D'INTERVENTION :
+
+1. TENSION DE LA COURROIE
+   - Localiser les vis de tension à l'arrière du convoyeur.
+   - Tourner la vis horaire pour tendre.
+   - Vérifier la tension : la courroie ne doit pas fléchir de plus de 2cm au centre.
+
+2. GRAISSAGE DES ROULEMENTS
+   - Utiliser une pompe à graisse avec Graisse Lithium Standard.
+   - Injecter 2 pressions dans chaque graisseur situé sur les flancs.
+
+SÉCURITÉ :
+- Ne jamais intervenir sur la courroie en mouvement.
+- Pas de vêtements amples ni de bijoux.

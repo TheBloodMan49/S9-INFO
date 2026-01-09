@@ -1,0 +1,23 @@
+TECHNICAL MANUAL - GENERATOR BACKUP POWER
+Model: Gen-X 5000 Diesel
+
+[SERVICEABLE PARTS]
+- Engine Oil: 15W40 Synthetic
+- Oil Filter: Cartridge Type (Ref: OF-GenX)
+- Fuel Filter: Inline clear bowl
+- Starter Battery: 12V 60Ah
+
+[MAINTENANCE PROCEDURES]
+
+-- OIL CHANGE --
+1. Place a pan under the drain plug.
+2. Remove plug, drain warm oil.
+3. Unscrew old Oil Filter.
+4. Install new filter (hand tight).
+5. Refill with 1.5L of 15W40.
+
+-- FUEL FILTER REPLACEMENT --
+1. Clamp the fuel line.
+2. Unscrew the clear housing.
+3. Swap the internal paper cartridge.
+4. Prime the fuel bulb before starting.

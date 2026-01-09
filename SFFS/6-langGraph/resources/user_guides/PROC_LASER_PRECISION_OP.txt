@@ -1,0 +1,24 @@
+MACHINE : Laser Cutter Precision
+FOURNISSEUR : OpticBeam Solutions
+
+I. COMPOSANTS OPTIQUES
+- Tube Laser CO2 (Consommable)
+- Miroirs de réflexion (M1, M2, M3)
+- Lentille focale (ZnSe, 2 pouces)
+
+II. PROCÉDURES DE MAINTENANCE
+
+[ALIGNEMENT DES MIROIRS]
+1. Placer du ruban adhésif thermique sur la cible du miroir.
+2. Tirer une impulsion courte (Pulse).
+3. Ajuster les vis micrométriques pour centrer l'impact.
+
+[NETTOYAGE LENTILLE]
+- Démonter la buse de la tête de coupe.
+- Dévisser l'anneau de retenue.
+- Nettoyer la lentille avec ACÉTONE et PAPIER OPTIQUE uniquement.
+- Remonter avec la face convexe vers le haut.
+
+III. RISQUES & SÉCURITÉ
+- Rayonnement Classe 4. Lunettes obligatoires (OD5+ @ 1064nm).
+- Risque d'incendie : Garder un extincteur CO2 à portée de main.

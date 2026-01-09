@@ -1,0 +1,23 @@
+MODEL: Packaging Unit Z-Series
+VENDOR: PackMaster
+
+[SPARE PARTS INVENTORY]
+1. Thermal Fuse (Part #TF-200)
+2. Heating/Sealing Bar
+3. Optical Sensors (Omron E3Z)
+4. Main Motherboard (PCB-Z-Series)
+
+[REPLACEMENT INSTRUCTIONS]
+
+> REPLACING THE THERMAL FUSE
+  - Located under the heating element cover.
+  - Cut the old fuse wires.
+  - Crimp the new fuse in place (Do not solder, heat will melt solder).
+
+> CLEANING OPTICAL SENSORS
+  - Locate the black sensors on the paper path rails.
+  - Use a dry cotton swab or compressed air to remove dust.
+  - Do not use alcohol on the plastic lens.
+
+[SAFETY]
+- High Temperature: Wait 15 mins after shutdown before touching the sealing bar.
