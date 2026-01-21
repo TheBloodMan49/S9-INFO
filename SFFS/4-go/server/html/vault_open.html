@@ -1,0 +1,518 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Coffre déverrouillé</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #38bdf8;
+      --danger: #ef4444;
+    }
+    body {
+      margin: 0;
+      height: 100vh;
+      display: flex;
+      align-items: stretch;
+      justify-content: center;
+      background: radial-gradient(90rem 60rem at 70% -10%, #0b1220, var(--bg));
+      color: var(--text);
+      font-family: system-ui, sans-serif;
+      line-height: 1.6;
+    }
+    .container {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1rem;
+      width: 90%;
+      max-width: 1200px;
+      padding: 1rem;
+    }
+    .chat {
+      display: flex;
+      flex-direction: column;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.02));
+      border: 1px solid rgba(148,163,184,0.2);
+      backdrop-filter: blur(3px);
+      padding: 1rem;
+    }
+    .messages {
+      flex: 1;
+      max-height: 400px;
+      overflow-y: auto;
+      border: 1px solid rgba(148,163,184,0.2);
+      border-radius: 8px;
+      padding: 0.5rem;
+      background: rgba(2,6,23,0.4);
+    }
+    .message {
+      margin: 0.4rem 0;
+      padding: 0.4rem 0.6rem;
+      border-radius: 6px;
+      background: rgba(56,189,248,0.15);
+      text-align: left;
+    }
+    .panel {
+      padding: 2rem;
+      border-radius: 14px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03));
+      border: 1px solid rgba(148,163,184,0.25);
+      backdrop-filter: blur(3px);
+      text-align: center;
+      position: relative;
+      box-shadow: 0 0 25px rgba(56,189,248,0.25);
+    }
+    h1 {
+      font-size: 1.8rem;
+      margin-bottom: 1rem;
+      color: var(--accent);
+      text-shadow: 0 0 8px rgba(56,189,248,0.6);
+    }
+    p {
+      margin: 0.6rem 0;
+    }
+    .mystery {
+      color: var(--muted);
+      font-style: italic;
+      margin-top: 1rem;
+    }
+    .gopher-img {
+      margin-top: 2rem;
+      width: 500px;
+      height: auto;
+      filter: drop-shadow(0 6px 18px rgba(56,189,248,0.35));
+      transition: transform 0.3s ease;
+    }
+    .gopher-img:hover {
+      transform: scale(1.05);
+    }
+    .reset-btn {
+      margin-top: 1rem;
+      padding: 0.6rem 1rem;
+      border-radius: 8px;
+      border: none;
+      background: var(--danger);
+      color: #fff;
+      font-weight: 600;
+      cursor: pointer;
+      display: none;
+    }
+
+
+    /* Client mystérieux css */
+    .mystery-avatar {
+      --cyan: #38bdf8;
+      --lime: #22c55e;
+      --pink: #f472b6;
+      --bg: rgba(255,255,255,0.06);
+      position: relative;
+      width: 220px;
+      height: 220px;
+      margin: 1.5rem auto 0;
+      border-radius: 20px;
+      background: linear-gradient(180deg, rgba(255,255,255,0.06), rgba(255,255,255,0.03));
+      border: 1px solid rgba(148,163,184,0.25);
+      box-shadow: 0 12px 40px rgba(56,189,248,0.16);
+      overflow: hidden;
+      animation: fadeIn 1.5s ease forwards;
+    }
+
+    .mystery-avatar::before,
+    .mystery-avatar::after {
+      content: "";
+      position: absolute;
+      inset: -35%;
+      background:
+        radial-gradient(120px 80px at 20% 30%, rgba(56,189,248,0.15), transparent 60%),
+        radial-gradient(100px 70px at 80% 20%, rgba(34,197,94,0.12), transparent 60%),
+        radial-gradient(140px 90px at 40% 80%, rgba(244,114,182,0.14), transparent 65%);
+      animation: glow 6s ease-in-out infinite alternate;
+      filter: blur(8px);
+      pointer-events: none;
+    }
+    .mystery-avatar::after { animation-delay: 2s; opacity: 0.7; }
+
+    @keyframes glow {
+      from { transform: translateY(-6px) scale(1); }
+      to   { transform: translateY(6px) scale(1.04); }
+    }
+
+    /* Face container */
+    .face {
+      position: absolute;
+      left: 50%;
+      top: 54%;
+      transform: translate(-50%, -50%);
+      width: 140px;
+      height: 120px;
+      border-radius: 18px;
+      background: linear-gradient(180deg, rgba(56,189,248,0.1), rgba(34,197,94,0.08));
+      border: 1px dashed rgba(148,163,184,0.35);
+    }
+
+    /* Eyes */
+    .eye {
+      position: absolute;
+      top: 28%;
+      width: 28px; height: 28px;
+      border-radius: 50%;
+      background: #fff;
+      box-shadow: 0 0 10px rgba(255,255,255,0.4);
+    }
+    .eye::after {
+      content: "";
+      position: absolute;
+      left: 50%; top: 50%;
+      width: 10px; height: 10px;
+      transform: translate(-50%, -50%);
+      border-radius: 50%;
+      background: #0f172a;
+      animation: blink 4.5s ease-in-out infinite;
+    }
+    .left  { left: 24px; }
+    .right { right: 24px; }
+
+    @keyframes blink {
+      0%, 92%, 100% { transform: translate(-50%, -50%) scaleY(1); }
+      94%           { transform: translate(-50%, -50%) scaleY(0.2); }
+    }
+
+    /* Mouth */
+    .mouth {
+      position: absolute;
+      bottom: 22%;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 46px; height: 16px;
+      border-radius: 12px;
+      background: #0f172a;
+      box-shadow: inset 0 -6px 0 rgba(56,189,248,0.35);
+    }
+
+    /* Antennas */
+    .antenna {
+      position: absolute;
+      width: 6px; height: 34px;
+      background: linear-gradient(180deg, #38bdf8, #22c55e);
+      border-radius: 3px;
+      box-shadow: 0 0 12px rgba(56,189,248,0.45);
+    }
+    .antenna::after {
+      content: "";
+      position: absolute;
+      left: 50%; top: -8px;
+      transform: translateX(-50%);
+      width: 12px; height: 12px;
+      border-radius: 50%;
+      background: #f472b6;
+      box-shadow: 0 0 10px rgba(244,114,182,0.8);
+    }
+    .a1 { left: 22px; top: 14px; transform: rotate(-8deg); }
+    .a2 { right: 22px; top: 12px; transform: rotate(8deg); }
+
+    /* Wavy cables */
+    .cable {
+      position: absolute;
+      bottom: -6px;
+      width: 140%;
+      height: 40px;
+      background:
+        radial-gradient(circle at 10% 50%, rgba(56,189,248,0.45) 0 6px, transparent 7px),
+        radial-gradient(circle at 30% 50%, rgba(34,197,94,0.5) 0 6px, transparent 7px),
+        radial-gradient(circle at 50% 50%, rgba(244,114,182,0.5) 0 6px, transparent 7px),
+        radial-gradient(circle at 70% 50%, rgba(56,189,248,0.45) 0 6px, transparent 7px),
+        radial-gradient(circle at 90% 50%, rgba(34,197,94,0.5) 0 6px, transparent 7px);
+      animation: wave 3.2s linear infinite;
+      opacity: 0.85;
+    }
+    .c1 { left: -20%; filter: blur(0.3px); }
+    .c2 { left: -10%; animation-duration: 4.6s; opacity: 0.6; }
+
+    @keyframes wave {
+      from { transform: translateY(0); }
+      to   { transform: translateY(-6px); }
+    }
+
+    /* Speech bubble */
+    .bubble {
+      position: absolute;
+      left: 50%;
+      bottom: 64px;
+      transform: translateX(-50%);
+      padding: 0.25rem 0.6rem;
+      border-radius: 999px;
+      font-size: 0.9rem;
+      color: #081018;
+      background: linear-gradient(180deg, #38bdf8, #22c55e);
+      box-shadow: 0 4px 18px rgba(34,197,94,0.35);
+      animation: say 3.4s ease-in-out infinite;
+    }
+    @keyframes say {
+      0%   { opacity: 0; transform: translateX(-50%) translateY(8px) scale(0.95); }
+      20%  { opacity: 1; transform: translateX(-50%) translateY(0) scale(1); }
+      60%  { opacity: 1; }
+      100% { opacity: 0; transform: translateX(-50%) translateY(-6px) scale(0.98); }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+
+    <!-- Colonne gauche : Texte + Gopher -->
+    <div class="panel">
+      <h1>Coffre déverrouillé</h1>
+      <p>Vous avez pénétré dans le coffre...</p>
+      <p>Un mystérieux client souhaite communiquer avec vous.</p>
+      <p>Construisez un serveur pour lui répondre, et peut-être qu’il vous offrira un cadeau.</p>
+      <p class="mystery">“Le dialogue est la clé. Le cadeau n’apparaît qu’à ceux qui savent écouter.”</p>
+
+      <div id="mystery-avatar" class="mystery-avatar" aria-label="Client mystérieux" style="display:none;">
+        <div class="face">
+          <div class="eye left"></div>
+          <div class="eye right"></div>
+          <div class="mouth"></div>
+        </div>
+        <div class="antenna a1"></div>
+        <div class="antenna a2"></div>
+        <div class="cable c1"></div>
+        <div class="cable c2"></div>
+        <div class="bubble">ping?</div>
+      </div>
+    </div>
+
+    <!-- Colonne droite : Chat -->
+    <div class="chat">
+      <div class="messages" id="messages"></div>
+      <button id="resetBtn" class="reset-btn" onclick="resetChat()">Recommencer le challenge</button>    
+      <img src="gopher.png" alt="Go Gopher" class="gopher-img" />
+    </div>
+
+  </div>
+
+  <script>
+    let messages = generateChallenge();
+
+    let index = 0;
+    let intervalId;
+
+    function generateChallenge() {
+      return [
+        "mysterious-client is connected.",
+        "mysterious-client~$> Bienvenue dans le coffre, Gopher !",
+        "mysterious-client~$> Cela fait une éternité que je suis bloqué ici...",
+        "mysterious-client~$> Je vais tester si tu es prêt à dialoguer mais attention car tu dois t'adapter à ce que je te demande.",
+        "mysterious-client~$> Je préfère changer le canal, allons sur la voie 8593 pour communiquer.",
+        "mysterious-client~$> Envoi GET /ping (attendu:pong)",
+        "mysterious-client~$> Envoi POST /flag1 (attendu:ok)",
+        "mysterious-client~$> Envoi GET /echo?token=test (attendu:test)",
+        "mysterious-client~$> Envoi POST /flag2 (attendu:ok)",
+        "mysterious-client~$> Deux autres clients viennent de se réveiller, ils arrivent en parallèle...",
+        "mysterious-client~$> Envoi GET /clients Observez bien les requêtes envoyées. (attendu:retour du numéro correspondant pour les 2 clients et retour de la somme pour la route du résultat)",
+        "mysterious-client~$> Et pour finir...",
+        "mysterious-client~$> Envoi POST /flag3 (attendu:ok)",
+        "mysterious-client~$> Hmmm... Bravo tu as montré que tu étais digne de reconstituer la clé.",
+        "mysterious-client~$> Combine les fragments de clé et récupère ton dû...",
+        "mysterious-client is disconnected."
+      ]
+    }
+    
+    const expectations = {
+      "/ping": "pong",
+      "/ping?token": "le token envoyé",
+      "/flag1": "ok",
+      "/echo": "le mot envoyé",
+      "/clientA": "le numéro envoyé par clientA",
+      "/clientB": "le numéro envoyé par clientB",
+      "/result": "la somme des deux numéros",
+      "/flag2": "2e fragment du flag",
+      "/flag3": "3e fragment du flag"
+    };
+
+    function addMessage(text) {
+      const msgBox = document.createElement('div');
+      msgBox.className = 'message';
+      msgBox.textContent = text;
+      document.getElementById('messages').appendChild(msgBox);
+      document.getElementById('messages').scrollTop = document.getElementById('messages').scrollHeight;
+    }
+
+    async function sendRequest(endpoint, method = "GET", bodyContent = null) {
+      try {
+        const options = { method };
+
+        if (bodyContent !== null && method === "POST") {
+          options.body = bodyContent;
+          options.headers = { "Content-Type": "text/plain" };
+        }
+
+        const res = await fetch(`http://localhost:8080/api${endpoint}`, options);
+        if (!res.ok) throw new Error("Erreur serveur");
+        const text = await res.text();
+        //addMessage(`mysterious-client~$> Réponse de ${endpoint}: ${text} (attendu: ${expectations[endpoint.split("?")[0]]})`);
+        return text;
+      } catch (e) {
+        document.getElementById("resetBtn").style.display = "block";
+        clearInterval(intervalId);
+        //addMessage("mysterious-client~$> ...connexion échouée. Le serveur n'est pas prêt. Comment oses-tu venir me déranger 0_0 ");
+        return null;
+      }
+    }
+
+    function startChat() {
+      intervalId = setInterval(async () => {
+        if (index < messages.length) {
+          const msg = messages[index];
+          addMessage(msg);
+          
+          // PING
+          if (msg.includes("GET /ping")) {
+            try {
+              const resp = await sendRequest("/ping");
+              if(resp !== "pong") {
+                throw new Error("Erreur serveur")
+              }
+            } catch(e) {
+              document.getElementById("resetBtn").style.display = "block";
+              clearInterval(intervalId);
+              addMessage(
+                "mysterious-client~$> ...connexion échouée. Le serveur n'est pas prêt. Comment oses-tu venir me déranger 0_0 "
+              );
+              return null;
+            }
+          }
+
+          // ECHO
+          if (msg.includes("GET /echo")) {
+            try {
+              const randomWord = Math.random().toString(36).substring(2,8);
+              const resp = await sendRequest(`/echo?token=${randomWord}`);
+              if(resp !== randomWord) {
+                throw new Error("Erreur serveur");
+              }
+            } catch (e) { 
+              document.getElementById("resetBtn").style.display = "block";
+              clearInterval(intervalId);
+              addMessage(
+                "mysterious-client~$> ...connexion échouée. Le serveur n'est pas prêt. Comment oses-tu venir me déranger 0_0 "
+              );
+              return null;
+            }
+          }
+
+          // FLAG1
+          if (msg.includes("POST /flag1")) {
+            try {
+              const resp = await sendRequest("/flag1", "POST", "RkxBR3tZMHVf");
+              if(resp !== "ok") {
+                throw new Error("Erreur serveur");
+              } 
+            } catch (e) { 
+                document.getElementById("resetBtn").style.display = "block";
+                clearInterval(intervalId);
+                addMessage(
+                  "mysterious-client~$> ...connexion échouée. Le serveur n'est pas prêt. Comment oses-tu venir me déranger 0_0 "
+                );
+                return null;
+            }
+          }
+
+          // FLAG2
+          if (msg.includes("POST /flag2")) {
+            try {
+              const resp = await sendRequest("/flag2", "POST", "YXIzX2FfcjNh");
+              if(resp !== "ok") {
+                throw new Error("Erreur serveur");
+              }
+            } catch (e) {
+              document.getElementById("resetBtn").style.display = "block";
+              clearInterval(intervalId);
+              addMessage(
+                "mysterious-client~$> ...connexion échouée. Le serveur n'est pas prêt. Comment oses-tu venir me déranger 0_0 "
+              );
+              return null;
+            }
+          }
+
+          // FLAG3
+          if (msg.includes("POST /flag3")) {
+            try {
+              const resp = await sendRequest("/flag3", "POST", "MV9Hb3BoM3J9");
+              if(resp !== "ok") {
+                throw new Error("Erreur serveur");
+              } 
+            } catch (e) {
+              document.getElementById("resetBtn").style.display = "block";
+              clearInterval(intervalId);
+              addMessage(
+                "mysterious-client~$> ...connexion échouée. Le serveur n'est pas prêt. Comment oses-tu venir me déranger 0_0 "
+              );
+              return null;
+            }
+          }
+
+          // CLIENTS
+          if (msg.includes("GET /clients")) {
+            const numA = Math.floor(Math.random() * 10) + 1;
+            const numB = Math.floor(Math.random() * 10) + 1;
+
+            try {
+              const [resA, resB] = await Promise.all([
+                sendRequest(`/clientA?num=${numA}`),
+                sendRequest(`/clientB?num=${numB}`)
+              ]);
+
+              if (parseInt(resA) !== numA || parseInt(resB) !== numB) {
+                throw new Error("Erreur serveur");
+              }
+
+              const sum = numA + numB;
+              const result = await sendRequest(`/result`);
+              if (parseInt(result) !== sum) {
+                throw new Error("Erreur serveur");
+              }
+            } catch (e) {
+              document.getElementById("resetBtn").style.display = "block";
+              clearInterval(intervalId);
+              addMessage(
+                "mysterious-client~$> ...connexion échouée. Le serveur n'est pas prêt. Comment oses-tu venir me déranger 0_0 "
+              );
+              return null;
+            }
+          }
+
+          index++;
+        } else {
+          document.getElementById("mystery-avatar").style.display = "none";
+          clearInterval(intervalId);
+        }
+      }, 1000);
+    }
+
+    function resetChat() {
+      document.getElementById('messages').innerHTML = "";
+      document.getElementById('resetBtn').style.display = "none";
+      index = 0;
+      startChat();
+    }
+
+    // Change le texte de la bulle pour rendre le client espiègle
+    const texts = ["ping?", "pong!", "ok!", "404?", "token?", "sum=42?", "slow...", "redirect?"];
+    setInterval(() => {
+      const bubble = document.querySelector('.mystery-avatar .bubble');
+      if (!bubble) return;
+      bubble.textContent = texts[Math.floor(Math.random() * texts.length)];
+    }, 2500);
+
+    setTimeout(() => {
+      document.getElementById("mystery-avatar").style.display = "block";
+    }, 3000);
+
+    startChat();
+  </script>
+</body>
+</html>

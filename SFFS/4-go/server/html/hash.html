@@ -1,0 +1,189 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Go CTF — Déceler les secrets du hash</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #22c55e;
+      --accent-2: #38bdf8;
+      --danger: #ef4444;
+    }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Ubuntu, Cantarell, "Noto Sans", sans-serif;
+      background: radial-gradient(90rem 60rem at 70% -10%, #0b1220, var(--bg));
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      padding: 2.5rem 1.25rem;
+      text-align: center;
+    }
+    .title {
+      font-size: clamp(1.6rem, 1.2rem + 2.4vw, 3rem);
+      margin: 0.25rem 0 0.5rem;
+      letter-spacing: 0.5px;
+    }
+    .subtitle {
+      margin: 0.25rem 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+    .container {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 0 1.25rem 3rem;
+    }
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid rgba(148,163,184,0.15);
+      border-radius: 14px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      backdrop-filter: blur(3px);
+    }
+    .panel.objectifs {
+      display: grid;
+      grid-template-columns: 1fr 400px; /* texte + colonne image */
+      align-items: start;
+      gap: 1rem;
+    }
+
+    .panel.objectifs img {
+      max-width: 100%; /* taille du gopher */
+      height: auto;
+      display: block;
+      margin: 0 auto;
+      filter: drop-shadow(0 6px 18px rgba(56,189,248,0.35));
+    }
+    h2 {
+      margin: 0.2rem 0 0.6rem;
+      font-size: 1.25rem;
+    }
+    p { margin: 0.4rem 0; }
+    code, .hint {
+      background: rgba(2,6,23,0.55);
+      border: 1px solid rgba(148,163,184,0.18);
+      padding: 0.25rem 0.45rem;
+      border-radius: 8px;
+      color: var(--accent-2);
+    }
+    ul { margin: 0.5rem 0 0.5rem 1.2rem; }
+    .mystery {
+      color: var(--danger);
+      font-weight: 600;
+      letter-spacing: 0.4px;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem 1rem 3rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="subtitle">Go CTF — Serveur d’énigmes web</div>
+    <h1 class="title">Déceler les secrets du hash</h1>
+    <div class="subtitle">Le Gopher doit briser les empreintes pour retrouver les secrets cachés</div>
+  </header>
+
+  <div class="container">
+    <div class="panel">
+      <h2>L’histoire</h2>
+      <p>Le petit <strong>Gopher</strong> est maintenant face à des mystérieux <em>hash bcrypt</em>. Le secret est dissimulé dans une wordlist, mais il ne sait pas s’il doit avancer pas à pas ou mobiliser une armée de travailleurs pour accélérer sa quête.</p>
+      <p class="hash1"><code>$2a$10$fMseHU97hUrALqerox/xluLxU2L7aI9zY5HW94jmJxnvTdMz.uWGu</code></p>
+      <p class="hash2"><code>$2a$10$dJq4XBcA/CfnKwORyroj7e86RY5UbwkTomWzSo4AHnMTO7kdh7rae</code></p>
+    </div>
+
+    <div class="panel">
+      <h2>Le défi</h2>
+      <p>Implémente un programme en Go pour casser un mot de passe dont le hash bcrypt est fourni. Compare deux approches :</p>
+      <ul>
+        <li><strong>Version séquentielle :</strong> tester chaque mot de passe un par un.</li>
+        <li><strong>Version concurrente :</strong> utiliser des goroutines et des workers pour paralléliser le cassage.</li>
+      </ul>
+      <p>Trouve le secret caché dans <code>rockyou.txt</code> (séquentiel) et celui présent dans <code>10k-most-common.txt</code> (parallélisé).</p>
+    </div>
+
+    <div class="panel">
+      <h2>Rappel</h2>
+      <p><strong>Fonction de hashage :</strong> transforme une donnée en une empreinte unique appelée hash.</p>
+      <ul>
+        <li>Irréversible : impossible de retrouver le mot original.</li>
+        <li>Déterministe : le même mot donne toujours le même hash.</li>
+        <li>Rapide à calculer, mais difficile à inverser.</li>
+      </ul>
+      <p><strong>bcrypt :</strong> conçu pour les mots de passe.</p>
+      <ul>
+        <li>Lent volontairement pour rendre le bruteforce coûteux.</li>
+        <li>Inclut un salt pour éviter les attaques par tables arc-en-ciel.</li>
+        <li>Couramment utilisé pour sécuriser les mots de passe en base de données.</li>
+      </ul>
+    </div>
+
+    <div class="panel objectifs">
+      <div>
+        <h2>Objectifs</h2>
+        <p><strong>2-1.go → Version séquentielle :</strong></p>
+        <pre><code>Lire le hash cible et la wordlist.
+  Tester chaque mot séquentiellement.
+  Comparer son hash bcrypt avec le hash cible.
+  Afficher le mot trouvé et le temps d’exécution.</code></pre>
+
+        <p><strong>2-2.go → Version concurrente :</strong></p>
+        <pre><code>Créer un pool de workers avec des goroutines.
+  Distribuer les mots de passe via un channel.
+  Synchroniser avec sync.WaitGroup.
+  Afficher le mot trouvé et le temps d’exécution.</code></pre>
+
+        <p><strong>Bonus :</strong></p>
+        <ul>
+          <li>Limiter le nombre de goroutines avec un pool.</li>
+          <li>Ajouter un timer pour mesurer la vitesse entre les 2 versions.</li>
+          <li>Tester l’impact du nombre de workers.</li>
+          <li>Réfléchir aux risques d’un trop grand nombre de goroutines.</li>
+        </ul>
+      </div>
+
+      <div>
+        <img src="gopher.png" alt="Go Gopher" />
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Entrées et sorties</h2>
+      <ul>
+        <li><strong>Entrée :</strong> hash cible + fichier wordlist.txt.</li>
+        <li><strong>Sortie :</strong> mot de passe trouvé (ou message si absent) + temps total d’exécution.</li>
+      </ul>
+    </div>
+
+    <div class="panel">
+      <h2>Exécution</h2>
+      <p><strong>Version séquentielle :</strong></p>
+      <pre><code>go run 2-1.go '$2a$10$fMseHU97hUrALqerox/xluLxU2L7aI9zY5HW94jmJxnvTdMz.uWGu' rockyou.txt</code></pre>
+
+      <p><strong>Version concurrente :</strong></p>
+      <pre><code>go run 2-2.go '$2a$10$rne/oP9aH7CgPbkhI..ZvOBhzePQkhW4s8gbpaTeeJG9nZnb0EtwG' 10k-most-common.txt</code></pre>
+    </div>
+
+    <div class="panel">
+      <h2>Conseil du Gopher</h2>
+      <p class="mystery">"Les secrets ne se révèlent qu’à ceux qui savent comparer les empreintes… et orchestrer leurs workers."</p>
+    </div>
+  </div>
+
+  <footer>
+    Bonne chance, Gopher. Les hashs ne cèdent qu’à ceux qui décryptent avec méthode.
+  </footer>
+</body>
+</html>

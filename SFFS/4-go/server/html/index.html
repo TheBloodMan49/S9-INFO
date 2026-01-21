@@ -1,0 +1,251 @@
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <title>Go CTF — À la recherche de la clé perdue</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    :root {
+      --bg: #0f172a;
+      --panel: #111827;
+      --text: #e5e7eb;
+      --muted: #94a3b8;
+      --accent: #22c55e;
+      --accent-2: #38bdf8;
+      --danger: #ef4444;
+    }
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      font-family: system-ui, -apple-system, Segoe UI, Roboto, "Helvetica Neue", Ubuntu, Cantarell, "Noto Sans", sans-serif;
+      background: radial-gradient(90rem 60rem at 70% -10%, #0b1220, var(--bg));
+      color: var(--text);
+      line-height: 1.6;
+    }
+    header {
+      padding: 2.5rem 1.25rem;
+      text-align: center;
+    }
+    .title {
+      font-size: clamp(1.6rem, 1.2rem + 2.4vw, 3rem);
+      margin: 0.25rem 0 0.5rem;
+      letter-spacing: 0.5px;
+    }
+    .subtitle {
+      margin: 0.25rem 0;
+      color: var(--muted);
+      font-size: 1rem;
+    }
+    .container {
+      max-width: 920px;
+      margin: 0 auto;
+      padding: 0 1.25rem 3rem;
+    }
+    .panel {
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+      border: 1px solid rgba(148,163,184,0.15);
+      border-radius: 14px;
+      padding: 1.25rem;
+      margin-bottom: 1rem;
+      backdrop-filter: blur(3px);
+    }
+    .intro-grid {
+      display: grid;
+      grid-template-columns: 1.1fr 0.9fr;
+      gap: 1rem;
+    }
+    .gopher {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.2rem;
+      border-radius: 12px;
+      background: linear-gradient(180deg, rgba(56,189,248,0.12), rgba(34,197,94,0.08));
+      border: 1px dashed rgba(148,163,184,0.25);
+    }
+    .gopher svg {
+      width: 140px;
+      height: 140px;
+      filter: drop-shadow(0 6px 18px rgba(56,189,248,0.25));
+    }
+    h2 {
+      margin: 0.2rem 0 0.6rem;
+      font-size: 1.25rem;
+    }
+    p { margin: 0.4rem 0; }
+    code, .hint {
+      background: rgba(2,6,23,0.55);
+      border: 1px solid rgba(148,163,184,0.18);
+      padding: 0.25rem 0.45rem;
+      border-radius: 8px;
+      color: var(--accent-2);
+    }
+    .challenges {
+      display: grid;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 1rem;
+      margin-top: 0.75rem;
+    }
+    .challenge {
+      padding: 1rem;
+      border-radius: 12px;
+      border: 1px solid rgba(148,163,184,0.18);
+      background: linear-gradient(180deg, rgba(255,255,255,0.04), rgba(255,255,255,0.02));
+    }
+    .badge {
+      display: inline-block;
+      font-size: 0.8rem;
+      background: rgba(34,197,94,0.15);
+      color: var(--accent);
+      padding: 0.15rem 0.5rem;
+      border-radius: 999px;
+      border: 1px solid rgba(34,197,94,0.35);
+      margin-bottom: 0.5rem;
+    }
+    .cta {
+      margin-top: 1rem;
+      display: flex;
+      gap: 0.75rem;
+      flex-wrap: wrap;
+    }
+    .btn {
+      display: inline-block;
+      width: 100%;
+      text-align: center;
+      padding: 0.6rem 0.9rem;
+      border-radius: 9px;
+      text-decoration: none;
+      color: var(--text);
+      border: 1px solid rgba(148,163,184,0.22);
+      background: linear-gradient(180deg, rgba(255,255,255,0.05), rgba(255,255,255,0.03));
+    }
+    .info-btn {
+      margin-top: 1rem;
+      padding: 0.8rem 1rem;
+      border-radius: 9px;
+      text-decoration: none;
+      color: #081018;
+      background: linear-gradient(180deg, #38bdf8, #22c55e);
+      font-weight: 600;
+      border: none;
+      cursor: pointer;
+    }
+    .btn.primary {
+      color: #081018;
+      background: linear-gradient(180deg, #38bdf8, #22c55e);
+      border: none;
+      font-weight: 600;
+    }
+    footer {
+      text-align: center;
+      padding: 2rem 1rem 3rem;
+      color: var(--muted);
+      font-size: 0.95rem;
+    }
+    .mystery {
+      color: var(--danger);
+      font-weight: 600;
+      letter-spacing: 0.4px;
+    }
+    @media (max-width: 860px) {
+      .intro-grid { grid-template-columns: 1fr; }
+      .challenges { grid-template-columns: 1fr; }
+    }
+    .gopher-img {
+      width: 500px;
+      height: auto;
+      filter: drop-shadow(0 6px 18px rgba(56,189,248,0.25));
+      transition: transform 0.3s ease;
+    }
+    .flag-format {
+      margin-top: 1rem;
+      padding: 0.75rem 1.25rem;
+      border: 2px solid var(--muted);
+      border-radius: 8px;
+      display: inline-block;
+      font-size: 1.2rem;
+      font-weight: 600;
+      color: var(--muted);
+      background: rgba(255,255,255,0.05);
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <div class="subtitle">Go CTF — Serveur d’énigmes web</div>
+    <h1 class="title">À la recherche de la clé perdue</h1>
+    <div class="subtitle">Aide le petit Gopher à déverrouiller ce serveur et retrouver sa clé</div>
+
+    <div class="flag-format">Format de la clé à récupérer : FLAG{X}</div>
+
+    <button class="info-btn" onclick="alert('L\'appellation CTF (Capture The Flag) fait référence à une compétition de cybersécurité où les participants doivent résoudre des énigmes techniques pour trouver des clés cachées appelées flags.')">
+      ℹ️ Info CTF
+    </button>
+  </header>
+
+  <div class="container">
+    <div class="intro-grid">
+      <div class="panel">
+        <h2>L’histoire</h2>
+        <p>Un petit <strong>Gopher</strong> curieux s’est aventuré sur ce serveur web. Malheureusement, il a égaré sa précieuse clé entre des chemins, des coffres, et des indices enfouis dans le trafic. Il n’a pas la force brute, mais toi, tu as le code.</p>
+        <p><strong>Ta mission : </strong>l’aider à explorer les <strong>différents chemins</strong>, comprendre la logique du serveur, et débusquer les accès qui mènent à la clé.</p>
+        <p class="hint">Indice initial — "Les routes ne sont pas toutes visibles... Certaines se dévoilent <em>quand on sait comment les chercher</em>."</p>
+      </div>
+      <div class="gopher" aria-label="Gopher">
+        <!-- Minimal Gopher-like illustration -->
+        <!--
+        <svg viewBox="0 0 128 128" xmlns="http://www.w3.org/2000/svg" role="img" aria-label="Go Gopher">
+          <defs>
+            <radialGradient id="g1" cx="50%" cy="30%" r="70%">
+              <stop offset="0" stop-color="#8be9fd"/>
+              <stop offset="1" stop-color="#3aaed8"/>
+            </radialGradient>
+          </defs>
+          <circle cx="64" cy="64" r="40" fill="url(#g1)"/>
+          <circle cx="52" cy="54" r="8" fill="#fff"/>
+          <circle cx="76" cy="54" r="8" fill="#fff"/>
+          <circle cx="54" cy="55" r="3" fill="#0f172a"/>
+          <circle cx="78" cy="55" r="3" fill="#0f172a"/>
+          <rect x="50" y="74" width="28" height="14" rx="7" fill="#0f172a"/>
+          <circle cx="46" cy="86" r="3" fill="#0f172a"/>
+          <circle cx="82" cy="86" r="3" fill="#0f172a"/>
+        </svg>
+        -->
+        <img src="gopher.png" alt="Go Gopher" class="gopher-img" />
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Les challenges</h2>
+      <div class="challenges">
+        <div class="challenge">
+          <div class="badge">Challenge 1</div>
+          <h3>Fouilles en Base64</h3>
+          <p>Un fichier massif t’attend. Chaque ligne cache un chemin encodé en Base64. Décoder, requêter, filtrer.</p>
+          <p class="hint">Cherche des <strong>chemins</strong>. Certains n'ont pas la même fin (workers et goroutines recommandés).</p>
+        </div>
+        <div class="challenge">
+          <div class="badge">Challenge 2</div>
+          <h3>Déceler les secrets</h3>
+          <p>Un problème de taille vous attend. Aide le petit Gopher a récupérer les secrets cachés. Peut-être pourront-ils servir pour la suite...</p>
+          <p class="hint">Un chemin peut en cacher un autre. Suis le fil (workers et goroutines nécessaires).</p>
+        </div>
+        <div class="challenge">
+          <div class="badge">Challenge 3</div>
+          <h3>Le coffre</h3>
+          <p>Une route protégée par un coffre. Sans la bonne combinaison, la porte reste close. Le petit Gopher a besoin de toi. Aide le à s'introduire dans le coffre. Certaines réponses s’étirent, d’autres changent de cap. Les redirections et les réponses lentes montrent le chemin aux patients. Observe les <strong>codes</strong>, mesure le <strong>temps</strong>, note les anomalies.</p>
+          <p class="hint">Le refus n'est pas un échec : un <code>401</code> peut être une piste, pas une fin.</p>
+        </div>
+      </div>
+
+      <div class="cta">
+        <a class="btn primary" href="/">Commencer l’exploration</a>      
+      </div>
+    </div>
+
+  <footer>
+    Bonne chance, Gopher. Le serveur ne cède qu’à ceux qui cherchent avec méthode.
+  </footer>
+</body>
+</html>
