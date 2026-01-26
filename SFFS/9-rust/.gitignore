@@ -1,0 +1,4 @@
+exos/*
+!exos/*.rs
+projet/.idea
+projet/target
