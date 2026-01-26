@@ -7,9 +7,9 @@
 [submodule "DSL"]
 	path = DSL
 	url = git@github.com:TheBloodMan49/S9-DSL-CLIvilization.git
-[submodule "SFFS/project"]
+[submodule "SFFS/1-grafana"]
 	path = SFFS/1-grafana
 	url = git@github.com:Sironysos/INSA-S9-SFFS-Grafana.git
 [submodule "DevOps/project"]
 	path = DevOps/project
-	url = ssh://git@gitlab.insa-rennes.fr:16022/devops-2025/devops_mohamed-allay_paul-gasnier_kevin-tollemer.git
+	url = git@github.com:TheBloodMan49/S9-DevOps.git
